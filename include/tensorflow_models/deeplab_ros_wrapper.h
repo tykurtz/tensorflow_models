@@ -2,6 +2,7 @@
 #include <image_transport/image_transport.h>
 #include <ros/package.h>
 #include <ros/ros.h>
+#include <memory>
 
 #include "tensorflow_models/deeplab.h"
 
@@ -13,7 +14,7 @@ class DeepLabv3RosWrapper {
   ~DeepLabv3RosWrapper() = default;
 
  protected:
-  DeepLabv3 deeplab_;
+  std::unique_ptr<DeepLabv3> deeplab_;
 
   ros::NodeHandle node_handle_, private_node_handle_;
   std::shared_ptr<image_transport::ImageTransport> image_transport_;

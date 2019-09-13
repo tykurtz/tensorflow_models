@@ -37,6 +37,13 @@ TODO Add Dockerfile, docker image, and run commands
 
 
 ## From source
+### Getting the models
+```sh
+cd tensorflow_models/models
+wget http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v1_fpn_shared_box_predictor_640x640_coco14_sync_2018_07_03.tar.gz
+tar -xvf ssd_mobilenet_v1_fpn_shared_box_predictor_640x640_coco14_sync_2018_07_03.tar.gz
+```
+
 ### Dependencies
 Requires a source build of tensorflow.
 

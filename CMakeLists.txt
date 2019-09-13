@@ -15,14 +15,13 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
 )
 
-add_compile_options(-std=c++14)
 ## System dependencies are found with CMake's conventions
 
 # Taken from https://github.com/PatWie/tensorflow-cmake/blob/master/inference/cc/CMakeLists.txt
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 find_package(TensorFlow REQUIRED)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=${TensorFlow_ABI}")
 set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=${TensorFlow_ABI}" )
@@ -72,6 +71,7 @@ add_library(${PROJECT_NAME}
   src/deeplab.cpp
   src/deeplab_ros_wrapper.cpp
   src/object_detection.cpp
+  src/image_io.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
 
