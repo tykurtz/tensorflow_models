@@ -1,7 +1,7 @@
 # Tensorflow Models in ROS
 This repository is a C++ ROS wrapper around several different networks pulled from [tensorflow/models](https://github.com/tensorflow/models)
 
-There are three target functionalities from this repository.
+There are currently four target functionalities from this repository.
 
 1. 2D bounding box object detectors from [tensorflow/models/research/object_detection](https://github.com/tensorflow/models/tree/master/research/object_detection)
 2. Semantic segmentation using [deeplab](https://github.com/tensorflow/models/tree/master/research/deeplab)
@@ -9,9 +9,13 @@ There are three target functionalities from this repository.
 4. Semantic segmentation using mean-variance estimators as model ensembles (see https://arxiv.org/pdf/1612.01474.pdf)
 
 TODO Add bounding box object detector
+
 TODO Nodelet implementation
+
 TODO Add separate launch file for semantic segmentation
+
 TODO Add script to pull models instead of saving on github
+
 TODO Add MVE model ensemble
 
 ## 2D Bounding box object detectors

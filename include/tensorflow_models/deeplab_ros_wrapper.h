@@ -3,7 +3,7 @@
 #include <ros/package.h>
 #include <ros/ros.h>
 
-#include "ros-semantic-segmentation/deeplab.h"
+#include "tensorflow_models/deeplab.h"
 
 namespace deeplab {
 

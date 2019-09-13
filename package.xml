@@ -5,7 +5,7 @@
   <description>Provides a ROS wrapper around some common networks found in tensorflow/models</description>
   <maintainer email="tyler.kurtz@bossanova.com">Tyler Kurtz</maintainer>
   <license>TODO</license>
-  <!-- <url type="website">http://wiki.ros.org/ros-semantic-segmentation</url> -->
+  <!-- <url type="website">http://wiki.ros.org/tensorflow_models/url> -->
   <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
 
   <depend>roscpp</depend>

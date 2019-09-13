@@ -1,7 +1,4 @@
-// Modified from
-// https://github.com/tradr-project/tensorflow_ros_test/blob/master/src/test.cpp
-
-#include "ros-semantic-segmentation/deeplab.h"
+#include "tensorflow_models/deeplab.h"
 #include <ros/ros.h>
 
 int main(int argc, char *argv[]) {
@@ -11,7 +8,7 @@ int main(int argc, char *argv[]) {
 
   // Load an image from disk
   tensorflow::Tensor image_tensor;
-  TF_CHECK_OK(deep_lab.readImageFromDisk(ros::package::getPath("ros-semantic-segmentation") + "/models/walmart.jpg", image_tensor));
+  TF_CHECK_OK(deep_lab.readImageFromDisk(ros::package::getPath("tensorflow_models") + "/models/walmart.jpg", image_tensor));
 
   tensorflow::Tensor output;
   TF_CHECK_OK(deep_lab.run_semantic_segmentation(image_tensor, output));
@@ -24,7 +21,7 @@ int main(int argc, char *argv[]) {
   std::cout << output.DebugString() << std::endl;
 
   // Save tensor to disk
-  TF_CHECK_OK(deep_lab.saveTensorToDisk("/home/pv20bot/coding/catkin_ws/output.jpg", output));
+  TF_CHECK_OK(deep_lab.saveTensorToDisk(ros::package::getPath("tensorflow_models") + "/output.jpg", output));
 
   return 0;
 }

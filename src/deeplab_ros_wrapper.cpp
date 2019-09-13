@@ -1,4 +1,4 @@
-#include "ros-semantic-segmentation/deeplab_ros_wrapper.h"
+#include "tensorflow_models/deeplab_ros_wrapper.h"
 
 namespace deeplab {
 

@@ -1,4 +1,4 @@
-#include "ros-semantic-segmentation/deeplab.h"
+#include "tensorflow_models/deeplab.h"
 
 namespace deeplab {
 
@@ -12,7 +12,7 @@ DeepLabv3::DeepLabv3() {
   // Read in the deeplab graph from disk
   tensorflow::GraphDef graph_def;
   TF_CHECK_OK(ReadBinaryProto(tensorflow::Env::Default(),
-                              ros::package::getPath("ros-semantic-segmentation") +
+                              ros::package::getPath("tensorflow_models") +
                                   "/models/deeplabv3_mnv2_ade20k_train_2018_12_03/"
                                   "frozen_inference_graph.pb",
                               &graph_def));
@@ -22,8 +22,6 @@ DeepLabv3::DeepLabv3() {
 
   TF_CHECK_OK(initialize_preprocess_network());
   TF_CHECK_OK(initialize_softmax_network());
-
-
 }
 
 tensorflow::Status DeepLabv3::readImageFromDisk(const tensorflow::string& file_name,

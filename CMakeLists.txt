@@ -71,6 +71,7 @@ include_directories(
 add_library(${PROJECT_NAME}
   src/deeplab.cpp
   src/deeplab_ros_wrapper.cpp
+  src/object_detection.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
 
@@ -84,6 +85,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ${catkin_LIBRARIES} ${OpenCV_LIBRAR
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(inference_node src/nodes/inference_node.cpp)
 target_link_libraries(inference_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
+
+add_executable(object_detection_node src/nodes/object_detection_node.cpp)
+target_link_libraries(object_detection_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
 
 add_executable(ros_inference_node src/nodes/ros_inference_node.cpp)
 target_link_libraries(ros_inference_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
