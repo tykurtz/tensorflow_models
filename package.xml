@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>tensorflow_models</name>
+  <version>0.0.0</version>
+  <description>Provides a ROS wrapper around some common networks found in tensorflow/models</description>
+  <maintainer email="tyler.kurtz@bossanova.com">Tyler Kurtz</maintainer>
+  <license>TODO</license>
+  <!-- <url type="website">http://wiki.ros.org/ros-semantic-segmentation</url> -->
+  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+
+  <depend>roscpp</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_geometry</depend>
+  <depend>image_transport</depend>
+  <depend>message_filters</depend>
+  <depend>nodelet</depend>
+  <depend>sensor_msgs</depend>
+  <buildtool_depend>catkin</buildtool_depend>
+</package>
