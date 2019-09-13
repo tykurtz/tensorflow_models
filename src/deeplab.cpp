@@ -2,12 +2,14 @@
 
 namespace deeplab {
 
-DeepLabv3::DeepLabv3(const std::string& model_path, bool verbose) : verbose_(verbose) {
-  tensorflow::SessionOptions options;
+DeepLabv3::DeepLabv3(const std::string& model_path, bool verbose, tensorflow::Session* session) : verbose_(verbose), session_(session) {
+  if (session_ == nullptr) {
+    tensorflow::SessionOptions options;
 
-  // Initialize a tensorflow session
-  options.config.mutable_gpu_options()->set_allow_growth(true);
-  TF_CHECK_OK(tensorflow::NewSession(options, &session_));
+    // Initialize a tensorflow session
+    options.config.mutable_gpu_options()->set_allow_growth(true);
+    TF_CHECK_OK(tensorflow::NewSession(options, &session_));
+  }
 
   // Read in the deeplab graph from disk
   tensorflow::GraphDef graph_def;
@@ -43,7 +45,7 @@ tensorflow::Status DeepLabv3::run_softmax_single_class(const tensorflow::Tensor&
   TF_CHECK_OK(session_->Run(inputs, {"ResizeBilinear_2:0"}, {}, &outputs));
 
   tensorflow::Tensor class_label_tensor(tensorflow::DT_INT32, tensorflow::TensorShape({1}));
-  class_label_tensor.vec<int32_t>()(0) = class_label; // This looks awful. Surely there's a better way...?
+  class_label_tensor.vec<int32_t>()(0) = class_label;  // This looks awful. Surely there's a better way...?
 
   inputs = {
       {SOFTMAX_INPUT_NAME, outputs.at(0)},

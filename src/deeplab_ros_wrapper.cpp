@@ -3,10 +3,13 @@
 namespace deeplab {
 
 DeepLabv3RosWrapper::DeepLabv3RosWrapper() : image_transport_(new image_transport::ImageTransport(node_handle_)), private_node_handle_("~") {
-  // TODO Change to getting the model path from param server
-  std::string model_path = ros::package::getPath("tensorflow_models") +
-                           "/models/deeplabv3_mnv2_ade20k_train_2018_12_03/"
-                           "frozen_inference_graph.pb";
+  std::string model_path;
+  if (!private_node_handle_.getParam("model_path", model_path)) {
+    model_path = ros::package::getPath("tensorflow_models") +
+                 "/models/deeplabv3_mnv2_ade20k_train_2018_12_03/"
+                 "frozen_inference_graph.pb";
+    ROS_WARN_STREAM("Could not find model_path on parameter server. Using default : " << model_path);
+  }
 
   deeplab_ = std::make_unique<DeepLabv3>(model_path);
 
