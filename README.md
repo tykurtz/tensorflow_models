@@ -1,31 +1,34 @@
 # Tensorflow Models in ROS
-This repository is a C++ ROS wrapper around several different networks pulled from https://github.com/tensorflow/models
+This repository is a C++ ROS wrapper around several different networks pulled from [tensorflow/models](https://github.com/tensorflow/models)
 
 There are three target functionalities from this repository.
 
-1. 2D bounding box object detectors from tensorflow/models/research/object_detection
-2. Semantic segmentation using deeplab
+1. 2D bounding box object detectors from [tensorflow/models/research/object_detection](https://github.com/tensorflow/models/tree/master/research/object_detection)
+2. Semantic segmentation using [deeplab](https://github.com/tensorflow/models/tree/master/research/deeplab)
 3. 2D "free space" estimation using a modified deeplab network.
-4. Semantic segmentation using mean-variance estimators as model ensembles
+4. Semantic segmentation using mean-variance estimators as model ensembles (see https://arxiv.org/pdf/1612.01474.pdf)
+
+TODO Add bounding box object detector
+TODO Nodelet implementation
+TODO Add separate launch file for semantic segmentation
+TODO Add script to pull models instead of saving on github
+TODO Add MVE model ensemble
 
 ## 2D Bounding box object detectors
-TODO Add model
 
 ## Semantic segmentation using deeplab
-TODO Add launch file that does semantic segmentation
 
 ## Free-space estimation in 2D for indoor robots
-ADE20K is a dataset that contains many examples of indoor images with segmentation labels. The approach here was to modify DeepLabv3 trained on ADE20K by taking the linear outputs before the ArgMax operation, and applying a softmax operation. By selecting the floor class layer from the softmax output, this gives a probability estimate of drivable terrain.
+ADE20K is a dataset that contains many examples of indoor images with segmentation labels. The approach here was to modify DeepLabv3 trained on ADE20K by taking the linear outputs before the ArgMax layer, and applying a softmax operation. By selecting the floor class layer from the softmax output, this gives a probability estimate of drivable terrain.
 
-NOTE: It's important to use this as a starting point and to fine-tune the model for your target environment. While ADE20K has the advantage of containing many indoor scenes, the labeling policy isn't appropriate for this task in particular (see https://github.com/CSAILVision/sceneparsing/blob/master/objectInfo150.csv for list of classes). For example, cityscapes includes dynamic and static object labeling, and wilddash includes a 'void' class which captures invalid setups. ADE20K does not have a 'catch all' type label for generic objects or a void label for sensor failures. Going through the dataset, one can see many examples of objects on the floor being included in the floor class.
+NOTE: It's important to use this as a starting point and to fine-tune the model for your target environment. While ADE20K has the advantage of containing many indoor scenes, the labeling policy isn't appropriate for this task in particular (see https://github.com/CSAILVision/sceneparsing/blob/master/objectInfo150.csv for list of classes). For example, labeling policies that I would find to be more robust are cityscapes including dynamic and static object classes, and wilddash including a 'void' class denoting invalid sensor input. ADE20K does not have a 'catch all' type label for generic objects nor a void label for sensor failures. Going through the dataset, one can see many examples of objects on the floor being included in the floor class.
 
 ## Free-space estimation using mean-variance estimators as model ensembles
-# TODO In progress
 
 # Getting started
 ## Docker
 
-Using docker with GPU support is the recommended approach.
+Using docker with GPU support is the recommended approach, due to possible complications with a source build of tensorflow.
 TODO Add Dockerfile, docker image, and run commands
 
 
@@ -70,7 +73,7 @@ export TENSORFLOW_SOURCE_DIR=/home/pv20bot/coding/source_builds/tensorflow
 ```
 
 # Motivation
-The primary goal is efficiency with the target language being C++. This gives us access to image_transport and nodelets, which cuts down on unnecessary serializing/deserializing of images. Another goal is flexibility by targeting tensorflow/models,
+The primary goal is efficiency with the target language being C++. This gives us access to image_transport and nodelets, which cuts down on unnecessary serializing/deserializing of images. Another goal is flexibility and compatability by targeting tensorflow/models,
 
 https://github.com/tensorflow/models/tree/master/research/object_detection for bounding box detection.
 https://github.com/tensorflow/models/tree/master/research/deeplab for segmentation, and for 2D 'free space' perception.
@@ -85,7 +88,7 @@ https://github.com/UbiquityRobotics/dnn_detect
 - C++, uses opencv DNN interface. Another good starting point, example uses SSD with a mobilenet backbone. Utilizes image_transport, no nodelet support
 
 https://github.com/osrf/tensorflow_object_detector
-- Python only, contains old fork of tensorflow/models.
+- Python only. Followed a similar approach by targetting an old fork of tensorflow/models.
 
 ### Tensorflow C++ integration with ROS
 https://github.com/tradr-project/tensorflow_ros_cpp
