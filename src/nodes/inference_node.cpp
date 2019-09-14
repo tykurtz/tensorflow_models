@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
                            "/models/deeplabv3_mnv2_ade20k_train_2018_12_03/"
                            "frozen_inference_graph.pb";
 
-  deeplab::DeepLabv3 deep_lab(model_path);
+  tensorflow_models::DeepLabv3 deep_lab(model_path);
 
   // Load an image from disk
   tensorflow::Tensor image_tensor, processed_image_tensor;

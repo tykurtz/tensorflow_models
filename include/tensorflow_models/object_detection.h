@@ -3,7 +3,7 @@
 #include "tensorflow/cc/ops/standard_ops.h"
 #include "tensorflow/core/public/session.h"
 
-namespace object_detection {
+namespace tensorflow_models {
 
 class ObjectDetection {
  public:
@@ -56,4 +56,4 @@ class ObjectDetection {
   std::string PREP_INPUT_NAME = "prep_input";
 };
 
-}  // namespace object_detection
+}  // namespace tensorflow_models

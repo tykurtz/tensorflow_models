@@ -2,7 +2,7 @@
 #include "tensorflow/cc/ops/standard_ops.h"
 #include "tensorflow/core/public/session.h"
 
-namespace deeplab {
+namespace tensorflow_models {
 
 /**
  * Enables running semantic segmentation and softmax on pretrained networks from https://github.com/tensorflow/models/tree/master/research/deeplab
@@ -54,4 +54,4 @@ class DeepLabv3 {
   bool verbose_;
 };
 
-}  // namespace deeplab
+}  // namespace tensorflow_models

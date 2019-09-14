@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
   std::string model_path = ros::package::getPath("tensorflow_models") +
                            "/models/ssd_mobilenet_v1_fpn_shared_box_predictor_640x640_coco14_sync_2018_07_03/" +
                            "frozen_inference_graph.pb";
-  object_detection::ObjectDetection object_detector(model_path);
+  tensorflow_models::ObjectDetection object_detector(model_path);
 
   // Load an image from disk
   tensorflow::Tensor image_tensor, processed_image_tensor;
@@ -27,10 +27,7 @@ int main(int argc, char* argv[]) {
   }
 
   cv::Mat draw_image;
-
   object_detector.draw_detection_boxes(network_output, image_tensor, draw_image);
-
-  std::cout << draw_image.rows << " " << draw_image.cols << " " << draw_image.channels() << std::endl;
 
   cv::cvtColor(draw_image, draw_image, cv::COLOR_RGB2BGR);
   cv::imwrite("/home/pv20bot/output.jpg", draw_image);

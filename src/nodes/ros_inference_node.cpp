@@ -4,7 +4,7 @@
 int main(int argc, char *argv[]) {
   ros::init(argc, argv, "semantic_segmentation_node");
 
-  deeplab::DeepLabv3RosWrapper deep_lab_ros;
+  tensorflow_models::DeepLabv3RosWrapper deep_lab_ros;
 
   ros::spin();
   return 0;

@@ -1,6 +1,6 @@
 #include "tensorflow_models/deeplab_ros_wrapper.h"
 
-namespace deeplab {
+namespace tensorflow_models {
 
 DeepLabv3RosWrapper::DeepLabv3RosWrapper() : image_transport_(new image_transport::ImageTransport(node_handle_)), private_node_handle_("~") {
   std::string model_path;
@@ -30,4 +30,4 @@ void DeepLabv3RosWrapper::image_cb(const sensor_msgs::ImageConstPtr& rgb_image) 
   image_pub_.publish(out_msg.toImageMsg());
 }
 
-}  // namespace deeplab
+}  // namespace tensorflow_models

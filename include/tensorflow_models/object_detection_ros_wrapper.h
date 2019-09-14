@@ -4,17 +4,17 @@
 #include <ros/ros.h>
 #include <memory>
 
-#include "tensorflow_models/deeplab.h"
+#include "tensorflow_models/object_detection.h"
 
 namespace tensorflow_models {
 
-class DeepLabv3RosWrapper {
+class ObjectDetectionRosWrapper {
  public:
-  DeepLabv3RosWrapper();
-  ~DeepLabv3RosWrapper() = default;
+  ObjectDetectionRosWrapper();
+  ~ObjectDetectionRosWrapper() = default;
 
  protected:
-  std::unique_ptr<DeepLabv3> deeplab_;
+  std::unique_ptr<ObjectDetection> object_detector_;
 
   ros::NodeHandle node_handle_, private_node_handle_;
   std::shared_ptr<image_transport::ImageTransport> image_transport_;

@@ -71,6 +71,7 @@ add_library(${PROJECT_NAME}
   src/deeplab.cpp
   src/deeplab_ros_wrapper.cpp
   src/object_detection.cpp
+  src/object_detection_ros_wrapper.cpp
   src/image_io.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
@@ -91,6 +92,9 @@ target_link_libraries(object_detection_node PUBLIC ${PROJECT_NAME} ${catkin_LIBR
 
 add_executable(ros_inference_node src/nodes/ros_inference_node.cpp)
 target_link_libraries(ros_inference_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
+
+add_executable(ros_object_detection_node src/nodes/ros_object_detection_node.cpp)
+target_link_libraries(ros_object_detection_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

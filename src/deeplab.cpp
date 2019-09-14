@@ -1,6 +1,6 @@
 #include "tensorflow_models/deeplab.h"
 
-namespace deeplab {
+namespace tensorflow_models {
 
 DeepLabv3::DeepLabv3(const std::string& model_path, bool verbose, tensorflow::Session* session) : verbose_(verbose), session_(session) {
   // Read in the deeplab graph from disk
@@ -86,7 +86,7 @@ tensorflow::Status DeepLabv3::pre_process_image(const cv::Mat& input_image, tens
   if (verbose_)
     std::cout << "Processed an image : " << output_image_tensor.DebugString() << std::endl;
 
-  return tensorflow::Status();
+  return tensorflow::Status::OK();
 }
 
 tensorflow::Status DeepLabv3::pre_process_image(const tensorflow::Tensor& input_image_tensor, tensorflow::Tensor& output_image_tensor) {
@@ -145,4 +145,4 @@ tensorflow::Status DeepLabv3::initialize_softmax_network() {
   TF_CHECK_OK(session_->Extend(softmax_graph));
   return tensorflow::Status::OK();
 }
-}  // namespace deeplab
+}  // namespace tensorflow_models

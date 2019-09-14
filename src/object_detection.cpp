@@ -1,6 +1,6 @@
 #include "tensorflow_models/object_detection.h"
 
-namespace object_detection {
+namespace tensorflow_models {
 
 ObjectDetection::ObjectDetection(const std::string& model_path, bool verbose, tensorflow::Session* session) : verbose_(verbose), session_(session) {
   // Read in the deeplab graph from disk
@@ -36,11 +36,33 @@ tensorflow::Status ObjectDetection::run_object_detection(const tensorflow::Tenso
 }
 
 bool ObjectDetection::run_object_detection(const cv::Mat& image, cv::Mat& output_image) {
-  // TODO
+  // Convert input image to tensor
+  tensorflow::Tensor input_tensor;
+  TF_CHECK_OK(pre_process_image(image, input_tensor));
+
+  std::vector<tensorflow::Tensor> output_tensors;
+  TF_CHECK_OK(run_object_detection(input_tensor, output_tensors));
+
+  cv::Mat draw_image;
+  draw_detection_boxes(output_tensors, input_tensor, output_image);
+
+  return true;
 }
 
 tensorflow::Status ObjectDetection::pre_process_image(const cv::Mat& input_image, tensorflow::Tensor& output_image_tensor) {
-  // TODO
+  int height, width;
+  height = input_image.rows;
+  width = input_image.cols;
+
+  tensorflow::Tensor image_tensor(tensorflow::DT_UINT8, tensorflow::TensorShape({height, width, 3}));
+  uint8_t* p = image_tensor.flat<uint8_t>().data();
+
+  cv::Mat target_buffer(height, width, CV_8UC3, p);
+  input_image.convertTo(target_buffer, CV_8UC3);
+
+  TF_CHECK_OK(pre_process_image(image_tensor, output_image_tensor));
+  if (verbose_)
+    std::cout << "Processed an image : " << output_image_tensor.DebugString() << std::endl;
   return tensorflow::Status::OK();
 }
 
@@ -110,4 +132,4 @@ void ObjectDetection::draw_detection_boxes(const std::vector<tensorflow::Tensor>
 void ObjectDetection::image_tensor_to_cv_mat(tensorflow::Tensor& image_tensor, cv::Mat& cv_image) {
   cv_image = cv::Mat(image_tensor.dim_size(0), image_tensor.dim_size(1), CV_8UC3, image_tensor.flat<uint8_t>().data());
 }
-}  // namespace object_detection
+}  // namespace tensorflow_models
