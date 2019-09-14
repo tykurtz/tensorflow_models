@@ -8,6 +8,8 @@ There are currently four target functionalities from this repository.
 3. 2D "free space" estimation using a modified deeplab network.
 4. Semantic segmentation using mean-variance estimators as model ensembles (see https://arxiv.org/pdf/1612.01474.pdf)
 
+TODO Add example images
+
 TODO Add bounding box object detector
 
 TODO Nodelet implementation
@@ -19,8 +21,10 @@ TODO Add script to pull models instead of saving on github
 TODO Add MVE model ensemble
 
 ## 2D Bounding box object detectors
+Models taken from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
 
 ## Semantic segmentation using deeplab
+Models taken from https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/model_zoo.md
 
 ## Free-space estimation in 2D for indoor robots
 ADE20K is a dataset that contains many examples of indoor images with segmentation labels. The approach here was to modify DeepLabv3 trained on ADE20K by taking the linear outputs before the ArgMax layer, and applying a softmax operation. By selecting the floor class layer from the softmax output, this gives a probability estimate of drivable terrain.

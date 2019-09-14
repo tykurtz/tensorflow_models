@@ -3,20 +3,21 @@
 namespace deeplab {
 
 DeepLabv3::DeepLabv3(const std::string& model_path, bool verbose, tensorflow::Session* session) : verbose_(verbose), session_(session) {
+  // Read in the deeplab graph from disk
+  tensorflow::GraphDef graph_def;
+  TF_CHECK_OK(ReadBinaryProto(tensorflow::Env::Default(), model_path, &graph_def));
+
   if (session_ == nullptr) {
     tensorflow::SessionOptions options;
 
     // Initialize a tensorflow session
     options.config.mutable_gpu_options()->set_allow_growth(true);
     TF_CHECK_OK(tensorflow::NewSession(options, &session_));
+    TF_CHECK_OK(session_->Create(graph_def));
+  } else {
+    // Add the graph to the session
+    TF_CHECK_OK(session_->Extend(graph_def));
   }
-
-  // Read in the deeplab graph from disk
-  tensorflow::GraphDef graph_def;
-  TF_CHECK_OK(ReadBinaryProto(tensorflow::Env::Default(), model_path, &graph_def));
-
-  // Add the graph to the session
-  TF_CHECK_OK(session_->Create(graph_def));
 
   TF_CHECK_OK(initialize_preprocess_network());
   TF_CHECK_OK(initialize_softmax_network());

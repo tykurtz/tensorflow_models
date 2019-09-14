@@ -42,6 +42,7 @@ tensorflow::Status readImageFromDisk(const tensorflow::string& file_name,
   TF_RETURN_IF_ERROR(session->Run({}, {output_name}, {}, &out_tensors));
 
   processed_image_tensor = out_tensors.at(0);
+  TF_CHECK_OK(session->Close());
 
   std::cout << "Successfully loaded an image : " << processed_image_tensor.DebugString() << std::endl;
 
@@ -64,6 +65,8 @@ tensorflow::Status saveTensorToDisk(const tensorflow::string& file_name, const t
   std::vector<tensorflow::Tensor> outputs;
   TF_CHECK_OK(session->Run({}, {"encode"}, {}, &outputs));
   std::ofstream(file_name, std::ios::binary) << outputs[0].scalar<std::string>()();
+
+  TF_CHECK_OK(session->Close());
 
   return tensorflow::Status::OK();
 }
