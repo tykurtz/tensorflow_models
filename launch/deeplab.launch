@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<launch>
+  <node pkg="tensorflow_models" name="inference_node" type="ros_inference_node" output="screen">
+    <remap from="/camera/color/image_raw" to="/videofile/image_raw" />
+    <param name="detection_class" value="4" />
+  </node>
+</launch>

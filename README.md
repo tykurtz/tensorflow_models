@@ -6,19 +6,8 @@ There are currently four target functionalities from this repository.
 1. 2D bounding box object detectors from [tensorflow/models/research/object_detection](https://github.com/tensorflow/models/tree/master/research/object_detection)
 2. Semantic segmentation using [deeplab](https://github.com/tensorflow/models/tree/master/research/deeplab)
 3. 2D "free space" estimation using a modified deeplab network.
-4. Semantic segmentation using mean-variance estimators as model ensembles (see https://arxiv.org/pdf/1612.01474.pdf)
+4. Planned - Free space estimation using mean-variance estimators as model ensembles (see https://arxiv.org/pdf/1612.01474.pdf)
 
-TODO Add example images
-
-TODO Add bounding box object detector
-
-TODO Nodelet implementation
-
-TODO Add separate launch file for semantic segmentation
-
-TODO Add script to pull models instead of saving on github
-
-TODO Add MVE model ensemble
 
 ## 2D Bounding box object detectors
 Models taken from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
@@ -33,11 +22,19 @@ NOTE: It's important to use this as a starting point and to fine-tune the model 
 
 ## Free-space estimation using mean-variance estimators as model ensembles
 
+# Roadmap
+* Test against example image for comparing results
+* Add example images to documentation
+* Add Dockerfile, docker image, and run commands
+* Nodelet implementation
+* Add separate launch file for semantic segmentation
+* Add script to pull models instead of saving on github (Squash after doing this)
+* Add MVE model ensemble
+
 # Getting started
 ## Docker
 
 Using docker with GPU support is the recommended approach, due to possible complications with a source build of tensorflow.
-TODO Add Dockerfile, docker image, and run commands
 
 
 ## From source

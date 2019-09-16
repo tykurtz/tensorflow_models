@@ -42,9 +42,17 @@ bool ObjectDetection::run_object_detection(const cv::Mat& image, cv::Mat& output
 
   std::vector<tensorflow::Tensor> output_tensors;
   TF_CHECK_OK(run_object_detection(input_tensor, output_tensors));
+  if (verbose_) {
+    for (const auto& output_tensor : output_tensors) {
+      std::cout << output_tensor.DebugString(20) << std::endl;
+    }
+  }
 
   cv::Mat draw_image;
   draw_detection_boxes(output_tensors, input_tensor, output_image);
+  if (verbose_) {
+    std::cout << output_image.cols << " " << output_image.rows << " " << output_image.channels() << std::endl;
+  }
 
   return true;
 }
@@ -61,8 +69,7 @@ tensorflow::Status ObjectDetection::pre_process_image(const cv::Mat& input_image
   input_image.convertTo(target_buffer, CV_8UC3);
 
   TF_CHECK_OK(pre_process_image(image_tensor, output_image_tensor));
-  if (verbose_)
-    std::cout << "Processed an image : " << output_image_tensor.DebugString() << std::endl;
+
   return tensorflow::Status::OK();
 }
 
@@ -122,6 +129,9 @@ void ObjectDetection::draw_detection_boxes(const std::vector<tensorflow::Tensor>
 
     float detection_score = detection_scores(i);
 
+    if (detection_score < .45)
+      continue;
+
     cv::Point upper_left_point(x_min * draw_image.cols, y_min * draw_image.rows);
     cv::Point lower_right_point(x_max * draw_image.cols, y_max * draw_image.rows);
 
@@ -130,6 +140,11 @@ void ObjectDetection::draw_detection_boxes(const std::vector<tensorflow::Tensor>
 }
 
 void ObjectDetection::image_tensor_to_cv_mat(tensorflow::Tensor& image_tensor, cv::Mat& cv_image) {
-  cv_image = cv::Mat(image_tensor.dim_size(0), image_tensor.dim_size(1), CV_8UC3, image_tensor.flat<uint8_t>().data());
+  if (image_tensor.dims() > 3) {
+    // If the input image tensor is in batch format, just take the first image of the batch
+    cv_image = cv::Mat(image_tensor.dim_size(1), image_tensor.dim_size(2), CV_8UC3, image_tensor.flat<uint8_t>().data());
+  } else {
+    cv_image = cv::Mat(image_tensor.dim_size(0), image_tensor.dim_size(1), CV_8UC3, image_tensor.flat<uint8_t>().data());
+  }
 }
 }  // namespace tensorflow_models
