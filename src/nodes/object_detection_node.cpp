@@ -13,15 +13,13 @@ int main(int argc, char* argv[]) {
   tensorflow_models::ObjectDetection object_detector(model_path);
 
   // Load an image from disk
-  tensorflow::Tensor image_tensor, processed_image_tensor;
+  tensorflow::Tensor image_tensor;
   TF_CHECK_OK(tensorflow_models::readImageFromDisk(ros::package::getPath("tensorflow_models") + "/test/walmart with more people.jpeg", image_tensor));
 
-  TF_CHECK_OK(object_detector.pre_process_image(image_tensor, processed_image_tensor));
-
   std::vector<tensorflow::Tensor> network_output;
-  TF_CHECK_OK(object_detector.run_object_detection(processed_image_tensor, network_output));
+  TF_CHECK_OK(object_detector.run_object_detection(image_tensor, network_output));
 
-  // // Print the results
+  // Print the results
   for (const auto& output : network_output) {
     std::cout << output.DebugString(20) << std::endl;
   }
@@ -31,8 +29,6 @@ int main(int argc, char* argv[]) {
 
   cv::cvtColor(draw_image, draw_image, cv::COLOR_RGB2BGR);
   cv::imwrite("/home/pv20bot/output.jpg", draw_image);
-  // Save tensor to disk
-  // TF_CHECK_OK(tensorflow_models::saveTensorToDisk(ros::package::getPath("tensorflow_models") + "/test/object_detection_out.jpg", network_output));
 
   return 0;
 }

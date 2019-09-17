@@ -76,7 +76,7 @@ tensorflow::Status DeepLabv3::pre_process_image(const cv::Mat& input_image, tens
   height = input_image.rows;
   width = input_image.cols;
 
-  tensorflow::Tensor unscaled_tensor(tensorflow::DT_UINT8, tensorflow::TensorShape({height, width, 3}));
+  tensorflow::Tensor unscaled_tensor(tensorflow::DT_UINT8, tensorflow::TensorShape({1, height, width, 3}));
   uint8_t* p = unscaled_tensor.flat<uint8_t>().data();
 
   cv::Mat target_buffer(height, width, CV_8UC3, p);
@@ -109,10 +109,9 @@ tensorflow::Status DeepLabv3::initialize_preprocess_network() {
   using namespace ::tensorflow::ops;
   auto root = tensorflow::Scope::NewRootScope();
   auto prep_input_tensor = Placeholder(root.WithOpName(PREP_INPUT_NAME), tensorflow::DT_UINT8);
-  auto dims_expander = ExpandDims(root.WithOpName("prep_dims_expand"), prep_input_tensor, 0);
 
   // TODO Add in logic for getting proper height and width
-  auto resized = ResizeBilinear(root.WithOpName("prep_resize"), dims_expander,
+  auto resized = ResizeBilinear(root.WithOpName("prep_resize"), prep_input_tensor,
                                 Const(root.WithOpName("size"), {288, 513}));
 
   auto casted = Cast(root.WithOpName(PREP_OUTPUT_NAME), resized, tensorflow::DT_UINT8);

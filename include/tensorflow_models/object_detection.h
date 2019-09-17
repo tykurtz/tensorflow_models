@@ -25,15 +25,11 @@ class ObjectDetection {
   bool run_object_detection(const cv::Mat& image, cv::Mat& output_image);
 
   /**
-   * Processes a cv::Mat object into the right tensorflow input
+   * Converts a cv::Mat to a tensor with dimensions {1, height, width, 3}
    */
-  tensorflow::Status pre_process_image(const cv::Mat& input_image, tensorflow::Tensor& output_image_tensor);
+  void convert_cvimage_to_tensor(const cv::Mat& input_image, tensorflow::Tensor& output_image_tensor);
 
-  /**
-   * Currently just adds a batch dimension of length == 1 to the network
-   */
-  tensorflow::Status pre_process_image(const tensorflow::Tensor& input_image_tensor, tensorflow::Tensor& output_image_tensor);
-
+  void image_tensor_to_cvimage(tensorflow::Tensor& image_tensor, cv::Mat& cv_image);
   /**
    * Given the network outputs and an image tensor, draw the bounding box detections on a cv Mat
    */
@@ -44,11 +40,8 @@ class ObjectDetection {
    */
   void draw_detection_boxes(const std::vector<tensorflow::Tensor>& network_outputs, cv::Mat& draw_image);
 
-  void image_tensor_to_cv_mat(tensorflow::Tensor& image_tensor, cv::Mat& cv_image);
 
  protected:
-  tensorflow::Status initialize_preprocess_network();
-
   tensorflow::Session* session_;
   bool verbose_;
 

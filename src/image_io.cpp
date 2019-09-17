@@ -19,16 +19,17 @@ tensorflow::Status readImageFromDisk(const tensorflow::string& file_name,
   std::string file_name_sub = file_name.substr(file_name.find_last_of('.') + 1);
 
   if (file_name_sub == "png") {
-    image_reader = DecodePng(root.WithOpName(output_name), file_reader,
+    image_reader = DecodePng(root.WithOpName("image_reader"), file_reader,
                              DecodePng::Channels(wanted_channels));
   } else if (file_name_sub == "gif") {
-    image_reader = DecodeGif(root.WithOpName(output_name), file_reader);
+    image_reader = DecodeGif(root.WithOpName("image_reader"), file_reader);
   } else {
     // Assume if it's neither a PNG nor a GIF then it must be a JPEG.
     image_reader = DecodeJpeg(
-        root.WithOpName(output_name), file_reader,
+        root.WithOpName("image_reader"), file_reader,
         DecodeJpeg::Channels(wanted_channels));
   }
+  auto dims_expander = ExpandDims(root.WithOpName(output_name), image_reader, 0);
 
   // This runs the GraphDef network definition that we've just constructed, and
   // returns the results in the output tensor.

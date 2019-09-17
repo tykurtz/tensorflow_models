@@ -30,6 +30,7 @@ NOTE: It's important to use this as a starting point and to fine-tune the model 
 * Add separate launch file for semantic segmentation
 * Add script to pull models instead of saving on github (Squash after doing this)
 * Add MVE model ensemble
+* Better colormap for object detection draw
 
 # Getting started
 ## Docker
