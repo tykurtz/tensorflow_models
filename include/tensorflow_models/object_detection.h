@@ -29,9 +29,15 @@ class ObjectDetection {
    */
   void convert_cvimage_to_tensor(const cv::Mat& input_image, tensorflow::Tensor& output_image_tensor);
 
+  /**
+   * Does a zero-copy conversion from tensorflow::Tensor to cv::Mat.
+   * WARNING: This ties cv_image to the lifetime of image_tensor. Undefined behavior is probably going to occur if cv_image is used after image_tensor goes out of scope. A member variable input_tensor_buffer_ is used to make this persistent
+   */
   void image_tensor_to_cvimage(tensorflow::Tensor& image_tensor, cv::Mat& cv_image);
+
   /**
    * Given the network outputs and an image tensor, draw the bounding box detections on a cv Mat
+   * WARNING: This method directly modifies image_tensor. As the memory is modified in place, draw_image is tied to the lifetime of image_tensor
    */
   void draw_detection_boxes(const std::vector<tensorflow::Tensor>& network_outputs, tensorflow::Tensor& image_tensor, cv::Mat& draw_image);
 
@@ -40,6 +46,10 @@ class ObjectDetection {
    */
   void draw_detection_boxes(const std::vector<tensorflow::Tensor>& network_outputs, cv::Mat& draw_image);
 
+  void set_detection_threshold(float threshold)
+  {
+    detection_threshold_ = threshold;
+  }
 
  protected:
   tensorflow::Session* session_;
@@ -47,6 +57,10 @@ class ObjectDetection {
 
   std::string PREP_OUTPUT_NAME = "prep_output";
   std::string PREP_INPUT_NAME = "prep_input";
+
+  float detection_threshold_ = .45;
+
+  tensorflow::Tensor input_tensor_buffer_;
 };
 
 }  // namespace tensorflow_models

@@ -2,6 +2,7 @@
 
 namespace tensorflow_models {
 
+// Modified from https://github.com/jhjin/tensorflow-cpp/blob/master/app.cc
 tensorflow::Status readImageFromDisk(const tensorflow::string& file_name,
                                      tensorflow::Tensor& processed_image_tensor) {
   using namespace ::tensorflow::ops;

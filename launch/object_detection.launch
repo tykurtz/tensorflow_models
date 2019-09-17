@@ -2,5 +2,6 @@
 <launch>
   <node pkg="tensorflow_models" name="object_detection_node" type="ros_object_detection_node" output="screen">
     <!-- <remap from="/camera/color/image_raw" to="/videofile/image_raw" /> -->
+    <param name="detection_threshold" value=".45" />
   </node>
 </launch>

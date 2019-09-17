@@ -35,11 +35,10 @@ tensorflow::Status ObjectDetection::run_object_detection(const tensorflow::Tenso
 
 bool ObjectDetection::run_object_detection(const cv::Mat& image, cv::Mat& output_image) {
   // Convert input image to tensor
-  tensorflow::Tensor input_tensor;
-  convert_cvimage_to_tensor(image, input_tensor);
+  convert_cvimage_to_tensor(image, input_tensor_buffer_);
 
   std::vector<tensorflow::Tensor> output_tensors;
-  TF_CHECK_OK(run_object_detection(input_tensor, output_tensors));
+  TF_CHECK_OK(run_object_detection(input_tensor_buffer_, output_tensors));
   if (verbose_) {
     for (const auto& output_tensor : output_tensors) {
       std::cout << output_tensor.DebugString(20) << std::endl;
@@ -47,7 +46,7 @@ bool ObjectDetection::run_object_detection(const cv::Mat& image, cv::Mat& output
   }
 
   cv::Mat draw_image;
-  draw_detection_boxes(output_tensors, input_tensor, output_image);
+  draw_detection_boxes(output_tensors, input_tensor_buffer_, output_image);
   if (verbose_) {
     std::cout << output_image.cols << " " << output_image.rows << " " << output_image.channels() << std::endl;
   }
@@ -60,7 +59,10 @@ void ObjectDetection::convert_cvimage_to_tensor(const cv::Mat& input_image, tens
   height = input_image.rows;
   width = input_image.cols;
 
-  output_image_tensor = tensorflow::Tensor(tensorflow::DT_UINT8, tensorflow::TensorShape({1, height, width, 3}));
+  // If the tensor is already in the right format, don't reallocate memory
+  if (output_image_tensor.shape() != tensorflow::TensorShape({1, height, width, 3}) || output_image_tensor.dtype() != tensorflow::DT_UINT8) {
+    output_image_tensor = tensorflow::Tensor(tensorflow::DT_UINT8, tensorflow::TensorShape({1, height, width, 3}));
+  }
   uint8_t* p = output_image_tensor.flat<uint8_t>().data();
 
   cv::Mat target_buffer(height, width, CV_8UC3, p);
@@ -97,12 +99,13 @@ void ObjectDetection::draw_detection_boxes(const std::vector<tensorflow::Tensor>
 
     float detection_score = detection_scores(i);
 
-    if (detection_score < .45)
+    if (detection_score < detection_threshold_)
       continue;
 
     cv::Point upper_left_point(x_min * draw_image.cols, y_min * draw_image.rows);
     cv::Point lower_right_point(x_max * draw_image.cols, y_max * draw_image.rows);
 
+    // TODO Make a better map from class -> color
     cv::rectangle(draw_image, upper_left_point, lower_right_point, cv::Scalar(detection_class, detection_class, detection_class), 8);
   }
 }

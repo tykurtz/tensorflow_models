@@ -21,6 +21,11 @@ ObjectDetectionRosWrapper::ObjectDetectionRosWrapper() : image_transport_(new im
 }
 
 void ObjectDetectionRosWrapper::image_cb(const sensor_msgs::ImageConstPtr& rgb_image) {
+  float detection_threshold;
+  if (private_node_handle_.getParam("detection_threshold", detection_threshold)) {
+    object_detector_->set_detection_threshold(detection_threshold);
+  }
+
   cv_bridge::CvImageConstPtr input_image = cv_bridge::toCvShare(rgb_image, "rgb8");
 
   cv_bridge::CvImage out_msg;
