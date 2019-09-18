@@ -54,9 +54,6 @@ class ObjectDetection {
   tensorflow::Session* session_;
   bool verbose_;
 
-  std::string PREP_OUTPUT_NAME = "prep_output";
-  std::string PREP_INPUT_NAME = "prep_input";
-
   float detection_threshold_ = .45;
 
   tensorflow::Tensor input_tensor_buffer_;
