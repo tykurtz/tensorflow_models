@@ -14,23 +14,23 @@ int main(int argc, char *argv[]) {
 
   // Load an image from disk
   tensorflow::Tensor image_tensor, processed_image_tensor;
-  TF_CHECK_OK(tensorflow_models::readImageFromDisk(ros::package::getPath("tensorflow_models") + "/test/walmart.jpg", image_tensor));
+  TF_CHECK_OK(tensorflow_models::ReadImageFromDisk(ros::package::getPath("tensorflow_models") + "/test/walmart.jpg", image_tensor));
 
   // Prep it for the network
-  TF_CHECK_OK(deep_lab.pre_process_image(image_tensor, processed_image_tensor));
+  TF_CHECK_OK(deep_lab.PreprocessImage(image_tensor, processed_image_tensor));
 
   tensorflow::Tensor output;
-  TF_CHECK_OK(deep_lab.run_semantic_segmentation(processed_image_tensor, output));
+  TF_CHECK_OK(deep_lab.RunSemanticSegmentation(processed_image_tensor, output));
 
   // Print the results
   std::cout << output.DebugString() << std::endl;  // Tensor<type: int64 shape: [1,288,513] values: [[6 6 6...]]...>
 
-  TF_CHECK_OK(deep_lab.run_softmax_single_class(processed_image_tensor, output));
+  TF_CHECK_OK(deep_lab.RunSoftmaxSingleClass(processed_image_tensor, output));
 
   std::cout << output.DebugString() << std::endl;
 
   // Save tensor to disk
-  TF_CHECK_OK(tensorflow_models::saveTensorToDisk(ros::package::getPath("tensorflow_models") + "/test/output.jpg", output));
+  TF_CHECK_OK(tensorflow_models::SaveTensorToDisk(ros::package::getPath("tensorflow_models") + "/test/output.jpg", output));
 
   return 0;
 }

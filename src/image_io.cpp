@@ -3,7 +3,7 @@
 namespace tensorflow_models {
 
 // Modified from https://github.com/jhjin/tensorflow-cpp/blob/master/app.cc
-tensorflow::Status readImageFromDisk(const tensorflow::string& file_name,
+tensorflow::Status ReadImageFromDisk(const tensorflow::string& file_name,
                                      tensorflow::Tensor& processed_image_tensor) {
   using namespace ::tensorflow::ops;
 
@@ -51,7 +51,7 @@ tensorflow::Status readImageFromDisk(const tensorflow::string& file_name,
   return tensorflow::Status::OK();
 }
 
-tensorflow::Status saveTensorToDisk(const tensorflow::string& file_name, const tensorflow::Tensor& tensor) {
+tensorflow::Status SaveTensorToDisk(const tensorflow::string& file_name, const tensorflow::Tensor& tensor) {
   using namespace ::tensorflow::ops;
   auto root = tensorflow::Scope::NewRootScope();
   // auto transpose = Transpose(root, cast, {1, 2, 0});

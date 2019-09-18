@@ -19,11 +19,11 @@ DeepLabv3::DeepLabv3(const std::string& model_path, bool verbose, tensorflow::Se
     TF_CHECK_OK(session_->Extend(graph_def));
   }
 
-  TF_CHECK_OK(initialize_preprocess_network());
-  TF_CHECK_OK(initialize_softmax_network());
+  TF_CHECK_OK(InitializePreprocessNetwork());
+  TF_CHECK_OK(InitializeSoftmaxNetwork());
 }
 
-tensorflow::Status DeepLabv3::run_semantic_segmentation(const tensorflow::Tensor& image_tensor, tensorflow::Tensor& output_tensor) {
+tensorflow::Status DeepLabv3::RunSemanticSegmentation(const tensorflow::Tensor& image_tensor, tensorflow::Tensor& output_tensor) {
   // Setup inputs and outputs:
   std::vector<std::pair<tensorflow::string, tensorflow::Tensor>> inputs = {
       {"ImageTensor:0", image_tensor}};
@@ -36,7 +36,7 @@ tensorflow::Status DeepLabv3::run_semantic_segmentation(const tensorflow::Tensor
     std::cout << "Semantic segmentation output " << output_tensor.DebugString() << std::endl;
 }
 
-tensorflow::Status DeepLabv3::run_softmax_single_class(const tensorflow::Tensor& image_tensor, tensorflow::Tensor& output_tensor, int class_label) {
+tensorflow::Status DeepLabv3::RunSoftmaxSingleClass(const tensorflow::Tensor& image_tensor, tensorflow::Tensor& output_tensor, int class_label) {
   // Setup inputs and outputs:
   std::vector<std::pair<tensorflow::string, tensorflow::Tensor>> inputs = {
       {"ImageTensor:0", image_tensor}};
@@ -58,12 +58,12 @@ tensorflow::Status DeepLabv3::run_softmax_single_class(const tensorflow::Tensor&
   return tensorflow::Status::OK();
 }
 
-bool DeepLabv3::run_softmax_single_class(const cv::Mat& image, cv::Mat& output_image, int class_label) {
+bool DeepLabv3::RunSoftmaxSingleClass(const cv::Mat& image, cv::Mat& output_image, int class_label) {
   // Convert input image to tensor
   tensorflow::Tensor input_tensor, output_tensor;
-  TF_CHECK_OK(pre_process_image(image, input_tensor));
+  TF_CHECK_OK(PreprocessImage(image, input_tensor));
 
-  TF_CHECK_OK(run_softmax_single_class(input_tensor, output_tensor, class_label));
+  TF_CHECK_OK(RunSoftmaxSingleClass(input_tensor, output_tensor, class_label));
 
   // Convert output tensor to image
   output_image = cv::Mat(output_tensor.dim_size(0), output_tensor.dim_size(1), CV_8UC1, output_tensor.flat<uint8_t>().data());
@@ -71,7 +71,7 @@ bool DeepLabv3::run_softmax_single_class(const cv::Mat& image, cv::Mat& output_i
   return true;
 }
 
-tensorflow::Status DeepLabv3::pre_process_image(const cv::Mat& input_image, tensorflow::Tensor& output_image_tensor) {
+tensorflow::Status DeepLabv3::PreprocessImage(const cv::Mat& input_image, tensorflow::Tensor& output_image_tensor) {
   int height, width;
   height = input_image.rows;
   width = input_image.cols;
@@ -82,14 +82,14 @@ tensorflow::Status DeepLabv3::pre_process_image(const cv::Mat& input_image, tens
   cv::Mat target_buffer(height, width, CV_8UC3, p);
   input_image.convertTo(target_buffer, CV_8UC3);
 
-  TF_CHECK_OK(pre_process_image(unscaled_tensor, output_image_tensor));
+  TF_CHECK_OK(PreprocessImage(unscaled_tensor, output_image_tensor));
   if (verbose_)
     std::cout << "Processed an image : " << output_image_tensor.DebugString() << std::endl;
 
   return tensorflow::Status::OK();
 }
 
-tensorflow::Status DeepLabv3::pre_process_image(const tensorflow::Tensor& input_image_tensor, tensorflow::Tensor& output_image_tensor) {
+tensorflow::Status DeepLabv3::PreprocessImage(const tensorflow::Tensor& input_image_tensor, tensorflow::Tensor& output_image_tensor) {
   std::vector<std::pair<tensorflow::string, tensorflow::Tensor>> inputs = {
       {PREP_INPUT_NAME, input_image_tensor}};
 
@@ -104,7 +104,7 @@ tensorflow::Status DeepLabv3::pre_process_image(const tensorflow::Tensor& input_
   return tensorflow::Status::OK();
 }
 
-tensorflow::Status DeepLabv3::initialize_preprocess_network() {
+tensorflow::Status DeepLabv3::InitializePreprocessNetwork() {
   // Add preprocess graph
   using namespace ::tensorflow::ops;
   auto root = tensorflow::Scope::NewRootScope();
@@ -112,7 +112,7 @@ tensorflow::Status DeepLabv3::initialize_preprocess_network() {
 
   // TODO Add in logic for getting proper height and width
   auto resized = ResizeBilinear(root.WithOpName("prep_resize"), prep_input_tensor,
-                                Const(root.WithOpName("size"), {288, 513}));
+                                Const(root.WithOpName("size"), {385, 513}));
 
   auto casted = Cast(root.WithOpName(PREP_OUTPUT_NAME), resized, tensorflow::DT_UINT8);
 
@@ -123,7 +123,7 @@ tensorflow::Status DeepLabv3::initialize_preprocess_network() {
   return tensorflow::Status::OK();
 }
 
-tensorflow::Status DeepLabv3::initialize_softmax_network() {
+tensorflow::Status DeepLabv3::InitializeSoftmaxNetwork() {
   // Add softmax graph
   using namespace ::tensorflow::ops;
   auto root = tensorflow::Scope::NewRootScope();
@@ -134,7 +134,7 @@ tensorflow::Status DeepLabv3::initialize_softmax_network() {
 
   auto const_tensor = Const(root, {0, 0});
   auto concat_tensor = Concat(root.WithOpName("likelihood_concat"), std::initializer_list<tensorflow::Input>({const_tensor, class_input_tensor}), 0);
-  auto slice_tensor = Slice(root.WithOpName("likelihood_slice"), squeeze_tensor, concat_tensor, Const(root, {288, 513, 1}));                                                           // Tensor<type: float shape: [288,513,1]
+  auto slice_tensor = Slice(root.WithOpName("likelihood_slice"), squeeze_tensor, concat_tensor, Const(root, {385, 513, 1}));                                                           // Tensor<type: float shape: [385,513,1]
   auto multiply_tensor = Multiply(root.WithOpName("likelihood_multiply"), slice_tensor, Cast(root.WithOpName("likelihood_multiply_cast"), Const(root, 255.0), tensorflow::DT_FLOAT));  // Scale this to 255 for saving an image
   auto cast = Cast(root.WithOpName(SOFTMAX_OUTPUT_NAME), multiply_tensor, tensorflow::DT_UINT8);
 

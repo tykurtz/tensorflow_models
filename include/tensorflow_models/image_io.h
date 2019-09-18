@@ -5,8 +5,8 @@
 
 namespace tensorflow_models {
 
-tensorflow::Status readImageFromDisk(const tensorflow::string& file_name, tensorflow::Tensor& processed_image_tensor);
+tensorflow::Status ReadImageFromDisk(const tensorflow::string& file_name, tensorflow::Tensor& processed_image_tensor);
 
-tensorflow::Status saveTensorToDisk(const tensorflow::string& file_name, const tensorflow::Tensor& tensor);
+tensorflow::Status SaveTensorToDisk(const tensorflow::string& file_name, const tensorflow::Tensor& tensor);
 
 }  // namespace tensorflow_models

@@ -14,10 +14,10 @@ int main(int argc, char* argv[]) {
 
   // Load an image from disk
   tensorflow::Tensor image_tensor;
-  TF_CHECK_OK(tensorflow_models::readImageFromDisk(ros::package::getPath("tensorflow_models") + "/test/walmart with more people.jpeg", image_tensor));
+  TF_CHECK_OK(tensorflow_models::ReadImageFromDisk(ros::package::getPath("tensorflow_models") + "/test/walmart with more people.jpeg", image_tensor));
 
   std::vector<tensorflow::Tensor> network_output;
-  TF_CHECK_OK(object_detector.run_object_detection(image_tensor, network_output));
+  TF_CHECK_OK(object_detector.RunObjectDetection(image_tensor, network_output));
 
   // Print the results
   for (const auto& output : network_output) {
@@ -25,10 +25,11 @@ int main(int argc, char* argv[]) {
   }
 
   cv::Mat draw_image;
-  object_detector.draw_detection_boxes(network_output, image_tensor, draw_image);
+  object_detector.DrawDetectionBoxes(network_output, image_tensor, draw_image);
 
   cv::cvtColor(draw_image, draw_image, cv::COLOR_RGB2BGR);
-  cv::imwrite("/home/pv20bot/output.jpg", draw_image);
+  std::string output_path = ros::package::getPath("tensorflow_models") + "/test/output.jpg";
+  cv::imwrite(output_path, draw_image);
 
   return 0;
 }

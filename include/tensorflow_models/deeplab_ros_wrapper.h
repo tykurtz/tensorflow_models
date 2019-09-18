@@ -21,6 +21,6 @@ class DeepLabv3RosWrapper {
   image_transport::Subscriber image_sub_;
   image_transport::Publisher image_pub_;
 
-  void image_cb(const sensor_msgs::ImageConstPtr& rgb_image);
+  void ImageCallback(const sensor_msgs::ImageConstPtr& rgb_image);
 };
 }  // namespace tensorflow_models

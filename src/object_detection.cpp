@@ -20,7 +20,7 @@ ObjectDetection::ObjectDetection(const std::string& model_path, bool verbose, te
   }
 }
 
-tensorflow::Status ObjectDetection::run_object_detection(const tensorflow::Tensor& image_tensor, std::vector<tensorflow::Tensor>& network_outputs) {
+tensorflow::Status ObjectDetection::RunObjectDetection(const tensorflow::Tensor& image_tensor, std::vector<tensorflow::Tensor>& network_outputs) {
   // Setup inputs and outputs:
   std::vector<std::pair<tensorflow::string, tensorflow::Tensor>> inputs = {
       {"image_tensor:0", image_tensor}};
@@ -33,12 +33,12 @@ tensorflow::Status ObjectDetection::run_object_detection(const tensorflow::Tenso
   return tensorflow::Status::OK();
 }
 
-bool ObjectDetection::run_object_detection(const cv::Mat& image, cv::Mat& output_image) {
+bool ObjectDetection::RunObjectDetection(const cv::Mat& image, cv::Mat& output_image) {
   // Convert input image to tensor
-  convert_cvimage_to_tensor(image, input_tensor_buffer_);
+  ConvertCvImageToTensor(image, input_tensor_buffer_);
 
   std::vector<tensorflow::Tensor> output_tensors;
-  TF_CHECK_OK(run_object_detection(input_tensor_buffer_, output_tensors));
+  TF_CHECK_OK(RunObjectDetection(input_tensor_buffer_, output_tensors));
   if (verbose_) {
     for (const auto& output_tensor : output_tensors) {
       std::cout << output_tensor.DebugString(20) << std::endl;
@@ -46,7 +46,7 @@ bool ObjectDetection::run_object_detection(const cv::Mat& image, cv::Mat& output
   }
 
   cv::Mat draw_image;
-  draw_detection_boxes(output_tensors, input_tensor_buffer_, output_image);
+  DrawDetectionBoxes(output_tensors, input_tensor_buffer_, output_image);
   if (verbose_) {
     std::cout << output_image.cols << " " << output_image.rows << " " << output_image.channels() << std::endl;
   }
@@ -54,7 +54,7 @@ bool ObjectDetection::run_object_detection(const cv::Mat& image, cv::Mat& output
   return true;
 }
 
-void ObjectDetection::convert_cvimage_to_tensor(const cv::Mat& input_image, tensorflow::Tensor& output_image_tensor) {
+void ObjectDetection::ConvertCvImageToTensor(const cv::Mat& input_image, tensorflow::Tensor& output_image_tensor) {
   int height, width;
   height = input_image.rows;
   width = input_image.cols;
@@ -69,7 +69,7 @@ void ObjectDetection::convert_cvimage_to_tensor(const cv::Mat& input_image, tens
   input_image.convertTo(target_buffer, CV_8UC3);
 }
 
-void ObjectDetection::image_tensor_to_cvimage(tensorflow::Tensor& image_tensor, cv::Mat& cv_image) {
+void ObjectDetection::ConvertTensorToCvImage(tensorflow::Tensor& image_tensor, cv::Mat& cv_image) {
   if (image_tensor.dims() > 3) {
     // If the input image tensor is in batch format, just take the first image of the batch
     cv_image = cv::Mat(image_tensor.dim_size(1), image_tensor.dim_size(2), CV_8UC3, image_tensor.flat<uint8_t>().data());
@@ -78,12 +78,12 @@ void ObjectDetection::image_tensor_to_cvimage(tensorflow::Tensor& image_tensor, 
   }
 }
 
-void ObjectDetection::draw_detection_boxes(const std::vector<tensorflow::Tensor>& network_outputs, tensorflow::Tensor& image_tensor, cv::Mat& draw_image) {
-  image_tensor_to_cvimage(image_tensor, draw_image);
-  draw_detection_boxes(network_outputs, draw_image);
+void ObjectDetection::DrawDetectionBoxes(const std::vector<tensorflow::Tensor>& network_outputs, tensorflow::Tensor& image_tensor, cv::Mat& draw_image) {
+  ConvertTensorToCvImage(image_tensor, draw_image);
+  DrawDetectionBoxes(network_outputs, draw_image);
 }
 
-void ObjectDetection::draw_detection_boxes(const std::vector<tensorflow::Tensor>& network_outputs, cv::Mat& draw_image) {
+void ObjectDetection::DrawDetectionBoxes(const std::vector<tensorflow::Tensor>& network_outputs, cv::Mat& draw_image) {
   int number_of_detections = int(network_outputs.at(0).flat<float>()(0));
   auto detection_classes = network_outputs.at(1).flat<float>();
   auto detection_boxes = network_outputs.at(2).tensor<float, 3>();

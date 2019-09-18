@@ -14,22 +14,22 @@ ObjectDetectionRosWrapper::ObjectDetectionRosWrapper() : image_transport_(new im
   object_detector_ = std::make_unique<ObjectDetection>(model_path);
 
   image_transport::TransportHints hints("raw", ros::TransportHints(), private_node_handle_);
-  image_sub_ = image_transport_->subscribe("/camera/color/image_raw", 1, std::bind(&ObjectDetectionRosWrapper::image_cb, this, std::placeholders::_1));
+  image_sub_ = image_transport_->subscribe("/camera/color/image_raw", 1, std::bind(&ObjectDetectionRosWrapper::ImageCallback, this, std::placeholders::_1));
   image_pub_ = image_transport_->advertise("/perception/detected_objects_draw", 1);
 
   // TODO Add detected object msgs and publish those.
 }
 
-void ObjectDetectionRosWrapper::image_cb(const sensor_msgs::ImageConstPtr& rgb_image) {
+void ObjectDetectionRosWrapper::ImageCallback(const sensor_msgs::ImageConstPtr& rgb_image) {
   float detection_threshold;
   if (private_node_handle_.getParam("detection_threshold", detection_threshold)) {
-    object_detector_->set_detection_threshold(detection_threshold);
+    object_detector_->SetDetectionThreshold(detection_threshold);
   }
 
   cv_bridge::CvImageConstPtr input_image = cv_bridge::toCvShare(rgb_image, "rgb8");
 
   cv_bridge::CvImage out_msg;
-  object_detector_->run_object_detection(input_image->image, out_msg.image);
+  object_detector_->RunObjectDetection(input_image->image, out_msg.image);
 
   out_msg.header = rgb_image->header;
   out_msg.encoding = sensor_msgs::image_encodings::RGB8;
