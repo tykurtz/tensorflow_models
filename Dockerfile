@@ -18,8 +18,8 @@ RUN apt update                          && \
       zip                                  \
       zlib1g-dev
 
-RUN pip install six numpy wheel setuptools mock 'future>=0.17.1'     && \
-    pip install keras_applications==1.0.6 --no-deps                  && \
+RUN pip install six numpy wheel setuptools mock 'future>=0.17.1' enum34 && \
+    pip install keras_applications==1.0.6 --no-deps                     && \
     pip install keras_preprocessing==1.0.5 --no-deps
 
 
@@ -44,12 +44,12 @@ ENV TF_CUDNN_VERSION=7
 WORKDIR /source_builds/tensorflow/
 RUN bazel build -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --config=cuda \
       --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=1" \
-      tensorflow/tools/pip_package:build_pip_package && \
-    bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip && \
-    bazel build -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --config=cuda \
+      tensorflow/tools/pip_package:build_pip_package
+RUN bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip
+RUN bazel build -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --config=cuda \
       --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=1" \
-      //tensorflow:libtensorflow_cc.so && \
-    bazel build -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --config=cuda \
+      //tensorflow:libtensorflow_cc.so
+RUN bazel build -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --config=cuda \
       --cxxopt="-D_GLIBCXX_USE_CXX11_ABI=1" \
       //tensorflow:libtensorflow.so
 

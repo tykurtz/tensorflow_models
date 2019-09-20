@@ -45,8 +45,10 @@ tensorflow::Status DeepLabv3::RunSoftmaxSingleClass(const tensorflow::Tensor& im
   std::vector<tensorflow::Tensor> outputs;
   TF_CHECK_OK(session_->Run(inputs, {"ResizeBilinear_2:0"}, {}, &outputs));
 
+  // This looks awful. Surely there's a better way...? Tried initializing class_label_tensor as a scalar and then using stack instead of concat in the softmax_network without any luck (Exception thrown due to alignment issues)
+  // tensorflow::Tensor class_label_tensor(static_cast<int32_t>(class_label));
   tensorflow::Tensor class_label_tensor(tensorflow::DT_INT32, tensorflow::TensorShape({1}));
-  class_label_tensor.vec<int32_t>()(0) = class_label;  // This looks awful. Surely there's a better way...?
+  class_label_tensor.vec<int32_t>()(0) = class_label;
 
   inputs = {
       {SOFTMAX_INPUT_NAME, outputs.at(0)},
