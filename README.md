@@ -6,10 +6,9 @@ There are currently four target functionalities from this repository.
 1. 2D bounding box object detectors from [tensorflow/models/research/object_detection](https://github.com/tensorflow/models/tree/master/research/object_detection)
 2. Semantic segmentation using [deeplab](https://github.com/tensorflow/models/tree/master/research/deeplab)
 3. 2D "free space" estimation using a modified deeplab network.
-4. Planned - Free space estimation using mean-variance estimators as model ensembles (see https://arxiv.org/pdf/1612.01474.pdf)
 
 ## 2D Bounding box object detectors
-Models taken from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
+Models taken from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md
 
 ## Semantic segmentation using deeplab
 Models taken from https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/model_zoo.md
@@ -19,21 +18,45 @@ ADE20K is a dataset that contains many examples of indoor images with segmentati
 
 NOTE: It's important to use this as a starting point and to fine-tune the model for your target environment. While ADE20K has the advantage of containing training examples of indoor scenes, the labeling policy isn't appropriate for this task in particular (see https://github.com/CSAILVision/sceneparsing/blob/master/objectInfo150.csv for list of classes). For example, labeling policies that I would find to be more robust are cityscapes including dynamic and static object classes, and wilddash including a 'void' class denoting invalid sensor input. ADE20K does not have a 'catch all' type label for generic objects nor a void label for sensor failures. Going through the dataset, one can see many examples of objects on the floor being included in the floor class.
 
-## Free-space estimation using mean-variance estimators as model ensembles
-TODO
-
-# Roadmap
-* Add example images to documentation
-* Add Dockerfile, docker image, and run commands
-* Nodelet implementation
-* Add separate launch file for semantic segmentation
-* Add script to pull models instead of saving on github (Squash after doing this)
-* Add MVE model ensemble
-* Better colormap for object detection draw
-* Colormap output for semantic segmentation
-* Semantic segmentation output
-
 # Getting started
+## Source build
+Requires a source build of tensorflow lite.
+Follow https://github.com/tensorflow/tensorflow/tree/master/tensorflow/lite/examples/minimal
+or
+
+```sh
+# Install cmake/tensorflow from source to get to C++ bindings
+mkdir source_builds; cd source_builds
+
+# System version of cmake on 18.04 isn't recent enough. Installing something more recent
+wget https://github.com/Kitware/CMake/releases/download/v3.19.2/cmake-3.19.2.tar.gz
+tar -xvf cmake-3.19.2.tar.gz
+cd cmake-3.19.2/
+cmake .
+make -j16
+sudo make install
+cd ..
+
+# Open a new shell due to conflicts with system cmake
+# Install tensorflow
+git clone https://github.com/tensorflow/tensorflow.git tensorflow_src
+mkdir minimal_build
+cd minimal_build
+cmake ../tensorflow_src/tensorflow/lite/examples/minimal
+cmake --build . -j
+
+# Install ROS dependencies for this package
+rosdep install --from-paths . --ignore-src -r -y --os=ubuntu:bionic
+catkin build --this
+```
+
+## Testing
+
+```sh
+rosrun tensorflow_models tf_lite_node $(pwd)/models/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite
+```
+
+
 ## Docker
 
 Using docker with GPU support is the recommended approach, due to possible complications with a source build of tensorflow.
@@ -67,3 +90,14 @@ https://github.com/tradr-project/tensorflow_ros_test
 
 https://github.com/PatWie/tensorflow-cmake
 - Source of the FindTensorflow.cmake file in this project
+
+# Roadmap
+* Add example images to documentation
+* Nodelet implementation
+* Add separate launch file for semantic segmentation
+* Add script to pull models instead of saving on github (Squash after doing this)
+* Better colormap for object detection draw
+* Colormap output for semantic segmentation
+* Semantic segmentation output
+* Add Dockerfile, docker image, and run commands
+* Add MVE model ensemble https://arxiv.org/pdf/1612.01474.pdf
