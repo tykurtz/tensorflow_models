@@ -18,16 +18,22 @@ RUN apt update                          && \
       zip                                  \
       zlib1g-dev
 
-RUN pip install six numpy wheel setuptools mock 'future>=0.17.1' enum34 && \
-    pip install keras_applications==1.0.6 --no-deps                     && \
-    pip install keras_preprocessing==1.0.5 --no-deps
+RUN pip install pip numpy wheel --no-cache-dir && \
+    pip install -U --user keras_preprocessing --no-deps --no-cache-dir
 
 
-RUN mkdir /source_builds                                 && \
-    cd /source_builds                                    && \
-    wget https://github.com/bazelbuild/bazel/releases/download/0.26.1/bazel-0.26.1-installer-linux-x86_64.sh && \
-   chmod +x bazel-0.26.1-installer-linux-x86_64.sh && \
-    ./bazel-0.26.1-installer-linux-x86_64.sh
+# RUN mkdir /source_builds                                 && \
+#     cd /source_builds                                    && \
+#     wget https://github.com/bazelbuild/bazel/releases/download/0.26.1/bazel-0.26.1-installer-linux-x86_64.sh && \
+#     chmod +x bazel-0.26.1-installer-linux-x86_64.sh && \
+#     ./bazel-0.26.1-installer-linux-x86_64.sh
+
+RUN sudo apt install curl gnupg && \
+  curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg && \
+  sudo mv bazel.gpg /etc/apt/trusted.gpg.d/ && \
+  echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list && \
+  sudo apt update && sudo apt install bazel-3.1.0 && \
+  sudo ln -s /usr/bin/bazel-3.1.0 /usr/local/bin/bazel
 
 RUN cd /source_builds                                    && \
   git clone https://github.com/tensorflow/tensorflow.git && \
