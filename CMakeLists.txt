@@ -14,33 +14,43 @@ find_package(catkin REQUIRED COMPONENTS
   roslib
   sensor_msgs
 )
+
+## System dependencies are found with CMake's conventions
+
+# Taken from https://github.com/PatWie/tensorflow-cmake/blob/master/inference/cc/CMakeLists.txt
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
+find_package(TensorFlow REQUIRED)
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=${TensorFlow_ABI}")
+set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=${TensorFlow_ABI}" )
+
+TensorFlow_REQUIRE_C_LIBRARY()
+TensorFlow_REQUIRE_SOURCE()
+
 find_package(OpenCV REQUIRED)
 
-# Setup tensorflow lite paths
-find_package(Threads REQUIRED)
-set(TF_LITE_INCLUDE_DIRS
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/tensorflow_src
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/flatbuffers/include
-)
-set(TF_LITE_LIBS
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/tensorflow-lite/libtensorflow-lite.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/_deps/flatbuffers-build/libflatbuffers.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/_deps/ruy-build/libruy.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/_deps/xnnpack-build/libXNNPACK.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/pthreadpool/libpthreadpool.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/cpuinfo/libcpuinfo.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/clog/libclog.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/_deps/fft2d-build/libfft2d_fftsg.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/_deps/fft2d-build/libfft2d_fftsg2d.a
-  ${CMAKE_CURRENT_SOURCE_DIR}/source_builds/minimal_build/_deps/farmhash-build/libfarmhash.a
-  ${CMAKE_DL_LIBS}
-  Threads::Threads
-)
+## Uncomment this if the package has a setup.py. This macro ensures
+## modules and global scripts declared therein get installed
+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
+# catkin_python_setup()
 
+
+###################################
+## catkin specific configuration ##
+###################################
+## The catkin_package macro generates cmake config files for your package
+## Declare things to be passed to dependent projects
+## INCLUDE_DIRS: uncomment this if your package contains header files
+## LIBRARIES: libraries you create in this project that dependent projects also need
+## CATKIN_DEPENDS: catkin_packages dependent projects also need
+## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES ${PROJECT_NAME}
  CATKIN_DEPENDS cv_bridge image_geometry image_transport message_filters nodelet sensor_msgs
+#  DEPENDS system_lib
 )
 
 ###########
@@ -51,38 +61,55 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
-  ${TF_LITE_INCLUDE_DIRS}
-  # ${catkin_INCLUDE_DIRS}
-  # ${OpenCV_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
+  TensorFlow_DEP
 )
-add_executable(tf_lite_node src/nodes/tf_lite_node.cpp)
-target_link_libraries(tf_lite_node ${TF_LITE_LIBS})
-
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/deeplab.cpp
-#   src/deeplab_ros_wrapper.cpp
-#   src/object_detection.cpp
-#   src/object_detection_ros_wrapper.cpp
-#   src/image_io.cpp
+add_library(${PROJECT_NAME}
+  src/deeplab.cpp
+  src/deeplab_ros_wrapper.cpp
+  src/object_detection.cpp
+  src/object_detection_ros_wrapper.cpp
+  src/image_io.cpp
+)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
+
+## Add cmake target dependencies of the library
+## as an example, code may need to be generated before libraries
+## either from message generation or dynamic reconfigure
+# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## Declare a C++ executable
+## With catkin_make all packages are built within a single CMake context
+## The recommended prefix ensures that target names across packages don't collide
+add_executable(inference_node src/nodes/inference_node.cpp)
+target_link_libraries(inference_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
+
+add_executable(object_detection_node src/nodes/object_detection_node.cpp)
+target_link_libraries(object_detection_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
+
+add_executable(ros_inference_node src/nodes/ros_inference_node.cpp)
+target_link_libraries(ros_inference_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
+
+add_executable(ros_object_detection_node src/nodes/ros_object_detection_node.cpp)
+target_link_libraries(ros_object_detection_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
+
+## Rename C++ executable without prefix
+## The above recommended prefix causes long target names, the following renames the
+## target back to the shorter version for ease of user use
+## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
+# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+
+## Add cmake target dependencies of the executable
+## same as for the library above
+# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## Specify libraries to link a library or executable target against
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
 # )
-# target_link_libraries(${PROJECT_NAME} PUBLIC ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
-
-# ## Declare a C++ executable
-# ## With catkin_make all packages are built within a single CMake context
-# ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(inference_node src/nodes/inference_node.cpp)
-# target_link_libraries(inference_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
-
-# add_executable(object_detection_node src/nodes/object_detection_node.cpp)
-# target_link_libraries(object_detection_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
-
-# add_executable(ros_inference_node src/nodes/ros_inference_node.cpp)
-# target_link_libraries(ros_inference_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
-
-# add_executable(ros_object_detection_node src/nodes/ros_object_detection_node.cpp)
-# target_link_libraries(ros_object_detection_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
 
 #############
 ## Install ##
