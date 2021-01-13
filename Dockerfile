@@ -7,16 +7,14 @@ RUN apt update                          && \
       g++                                  \
       git                                  \
       pkg-config                           \
-      python-dev                           \
-      python-pip                           \
-      python-setuptools                    \
       python3-dev                          \
       python3-pip                          \
       python3-setuptools                   \
       unzip                                \
       wget                                 \
       zip                                  \
-      zlib1g-dev
+      zlib1g-dev &&
+    rm -rf /var/lib/apt/lists/*
 
 RUN pip install six numpy wheel setuptools mock 'future>=0.17.1' enum34 && \
     pip install keras_applications==1.0.6 --no-deps                     && \
@@ -26,7 +24,7 @@ RUN pip install six numpy wheel setuptools mock 'future>=0.17.1' enum34 && \
 RUN mkdir /source_builds                                 && \
     cd /source_builds                                    && \
     wget https://github.com/bazelbuild/bazel/releases/download/0.26.1/bazel-0.26.1-installer-linux-x86_64.sh && \
-   chmod +x bazel-0.26.1-installer-linux-x86_64.sh && \
+    chmod +x bazel-0.26.1-installer-linux-x86_64.sh && \
     ./bazel-0.26.1-installer-linux-x86_64.sh
 
 RUN cd /source_builds                                    && \

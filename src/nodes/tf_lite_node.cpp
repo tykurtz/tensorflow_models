@@ -9,11 +9,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
-#include <cstdio>
 #include "tensorflow/lite/interpreter.h"
 #include "tensorflow/lite/kernels/register.h"
 #include "tensorflow/lite/model.h"
 #include "tensorflow/lite/optional_debug_tools.h"
+#include <cstdio>
 
 // This is an example that is minimal to read a model
 // from disk and perform inference. There is no data being loaded
@@ -35,8 +35,8 @@ int main(int argc, char* argv[]) {
   if (argc != 2) {
     fprintf(stderr, "minimal <tflite model>\n");
     return 1;
-
   }
+
   const char* filename = argv[1];
 
   // Load model

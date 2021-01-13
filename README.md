@@ -54,14 +54,22 @@ catkin build --this
 
 ```sh
 rosrun tensorflow_models tf_lite_node $(pwd)/models/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite
+# INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+# === Pre-invoke Interpreter State ===
+# Interpreter has 184 tensors and 64 nodes
+# Inputs: 175
+# Outputs: 167 168 169 170
+
+# Tensor   0 BoxPredictor_0/BoxEncodingPredictor/BiasAdd kTfLiteUInt8  kTfLiteArenaRw       4332 bytes ( 0.0 MB)  1 19 19 12
+# Tensor   1 BoxPredictor_0/BoxEncodingPredictor/Conv2D_bias kTfLiteInt32   kTfLiteMmapRo         48 bytes ( 0.0 MB)  12
+
+rosrun --prefix 'gdb --args' tensorflow_models tf_lite_node $(pwd)/models/lite-model_ssd_mobilenet_v1_1_metadata_2.tflite
 ```
 
 
 ## Docker
 
-Using docker with GPU support is the recommended approach, due to possible complications with a source build of tensorflow.
-
-For using this repository from source, please refer to the Dockerfile.
+WIP.
 
 # Motivation
 The primary goal is efficiency with the target language being C++. This gives access to image_transport and nodelets, which cuts down on unnecessary serializing/deserializing of images. Another goal was to target tensorflow/models,
