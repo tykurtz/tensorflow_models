@@ -1,0 +1,5 @@
+.ccls-root
+source_builds
+source_builds_backup
+test/output.jpg
+test/output_object_detection.jpg
