@@ -34,11 +34,34 @@ TODO
 * Semantic segmentation output
 
 # Getting started
+
+## Building
+Follow https://www.tensorflow.org/install/source to setup CUDA, install bazel, and build tensorflow from source. Be sure to verify the correct kernel, tensorflow, bazel, CUDA, and cudnn versions. You can reference the dockerfile for more details on building from source.
+
+```sh
+bazel build -c opt tensorflow/tools/pip_package:build_pip_package
+bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/pip
+bazel build -c opt -j 8 //tensorflow:libtensorflow_cc.so
+bazel build -c opt -j 8 //tensorflow:libtensorflow.so
+
+pip install /tmp/pip/tensorflow-2.4.0-cp36-cp36m-linux_x86_64.whl
+
+catkin build --this --cmake-args -DTensorFlow_SOURCE_DIR:PATH=$(pwd)/source_builds/tensorflow -DTensorFlow_BUILD_DIR:PATH=$(pwd)/source_builds/tensorflow/bazel-bin/tensorflow
+```
+
+## Testing images
+
+```sh
+# Test estimation of driveable terrain on a single image
+rosrun tensorflow_models estimate_path \
+    $(rospack find tensorflow_models)/models/deeplabv3_mnv2_ade20k_train_2018_12_03/frozen_inference_graph.pb \
+    $(rospack find tensorflow_models)/test/walmart.jpg \
+    $(rospack find tensorflow_models)/test/output.jpg
+
+```
+
 ## Docker
-
-Using docker with GPU support is the recommended approach, due to possible complications with a source build of tensorflow.
-
-For using this repository from source, please refer to the Dockerfile.
+Using docker with GPU support will be the recommended approach, but is currently WIP.
 
 # Motivation
 The primary goal is efficiency with the target language being C++. This gives access to image_transport and nodelets, which cuts down on unnecessary serializing/deserializing of images. Another goal was to target tensorflow/models,

@@ -66,7 +66,7 @@ tensorflow::Status SaveTensorToDisk(const tensorflow::string& file_name, const t
 
   std::vector<tensorflow::Tensor> outputs;
   TF_CHECK_OK(session->Run({}, {"encode"}, {}, &outputs));
-  std::ofstream(file_name, std::ios::binary) << outputs[0].scalar<std::string>()();
+  std::ofstream(file_name, std::ios::binary) << outputs[0].scalar<tensorflow::tstring>()();
 
   TF_CHECK_OK(session->Close());
 

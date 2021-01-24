@@ -38,7 +38,7 @@ RUN sudo apt install curl gnupg && \
 RUN cd /source_builds                                    && \
   git clone https://github.com/tensorflow/tensorflow.git && \
   cd tensorflow                                          && \
-  git checkout r1.14
+  git checkout r2.4
 
 ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 ENV TF_NEED_CUDA 1

@@ -42,18 +42,6 @@
 #   - kernels/<op-name>_op.h
 #   - ops/<op-name>.cc
 
-if(APPLE)
-  message(WARNING "This FindTensorflow.cmake is not tested on APPLE\n"
-                  "Please report if this works\n"
-                  "https://github.com/PatWie/tensorflow-cmake")
-endif()
-
-if(WIN32)
-  message(WARNING "This FindTensorflow.cmake is not tested on WIN32\n"
-                  "Please report if this works\n"
-                  "https://github.com/PatWie/tensorflow-cmake")
-endif()
-
 set(PYTHON_EXECUTABLE "python3" CACHE STRING "specify the python version TensorFlow is installed on.")
 
 if(TensorFlow_FOUND AND EXISTS "${TensorFlow_LIBRARY}" AND IS_DIRECTORY "${TensorFlow_INCLUDE_DIR}")
@@ -79,8 +67,10 @@ else()
   list(GET TF_INFORMATION_LIST 1 TF_DETECTED_ABI)
   list(GET TF_INFORMATION_LIST 2 TF_DETECTED_INCLUDE_DIR)
   list(GET TF_INFORMATION_LIST 3 TF_DETECTED_LIBRARY_PATH)
-
-  # set(TF_DETECTED_VERSION 1.8)
+  message(STATUS "TF_DETECTED_VERSION ${TF_DETECTED_VERSION}")
+  message(STATUS "TF_DETECTED_ABI ${TF_DETECTED_ABI}")
+  message(STATUS "TF_DETECTED_INCLUDE_DIR ${TF_DETECTED_INCLUDE_DIR}")
+  message(STATUS "TF_DETECTED_DETECTED_LIBRARY_PATH ${TF_DETECTED_LIBRARY_PATH}")
 
   set(_packageName "TF")
   if (DEFINED TF_DETECTED_VERSION)
@@ -103,14 +93,6 @@ else()
       set (TF_DETECTED_VERSION_COUNT 0)
   endif()
 
-
-  # -- prevent pre 1.9 versions
-  # Note: TensorFlow 1.7 supported custom ops and all header files.
-  # TensorFlow 1.8 broke that promise and 1.9, 1.10 are fine again.
-  # This cmake-file is only tested against 1.9+.
-  if("${TF_DETECTED_VERSION}" VERSION_LESS "1.9")
-    message(FATAL_ERROR "Your installed TensorFlow version ${TF_DETECTED_VERSION} is too old.")
-  endif()
 
   if(TF_FIND_VERSION_EXACT)
     # User requested exact match of TensorFlow.
@@ -217,6 +199,8 @@ else()
     endif()
   endif()
 
+  message(STATUS "TF C LIBRARY DIR ${TensorFlow_C_LIBRARY_DIR}")
+  message(STATUS "TF detected path ${TF_DETECTED_LIBRARY_PATH}")
   find_library( TF_DETECTED_LIBRARY
       NAMES tensorflow_framework
       PATHS "${TensorFlow_C_LIBRARY_DIR}" # Prefer the library from the build tree, if TensorFlow_C_LIBRARY is detected.
@@ -230,30 +214,18 @@ else()
   endif()
 
   # test all given versions
-  set(TensorFlow_FOUND FALSE)
-  # foreach(_TensorFlow_VER ${_TensorFlow_TEST_VERSIONS})
-  #   if("${TF_DETECTED_VERSION_MAJOR}.${TF_DETECTED_VERSION_MINOR}" STREQUAL "${_TensorFlow_VER}")
-      # found appropriate version
-      set(TensorFlow_VERSION ${TF_DETECTED_VERSION})
-      set(TensorFlow_ABI ${TF_DETECTED_ABI})
-      set(TensorFlow_INCLUDE_DIR ${TF_DETECTED_INCLUDE_DIR})
-      set(TensorFlow_LIBRARY ${TF_DETECTED_LIBRARY})
-      set(TensorFlow_FOUND TRUE)
-      message(STATUS "Found TensorFlow: (found appropriate version \"${TensorFlow_VERSION}\")")
-      message(STATUS "TensorFlow-ABI is ${TensorFlow_ABI}")
-      message(STATUS "TensorFlow-INCLUDE_DIR is ${TensorFlow_INCLUDE_DIR}")
-      message(STATUS "TensorFlow-LIBRARY is ${TensorFlow_LIBRARY}")
+  set(TensorFlow_VERSION ${TF_DETECTED_VERSION})
+  set(TensorFlow_ABI ${TF_DETECTED_ABI})
+  set(TensorFlow_INCLUDE_DIR ${TF_DETECTED_INCLUDE_DIR})
+  set(TensorFlow_LIBRARY ${TF_DETECTED_LIBRARY})
+  set(TensorFlow_FOUND TRUE)
+  message(STATUS "Found TensorFlow: (found appropriate version \"${TensorFlow_VERSION}\")")
+  message(STATUS "TensorFlow-ABI is ${TensorFlow_ABI}")
+  message(STATUS "TensorFlow-INCLUDE_DIR is ${TensorFlow_INCLUDE_DIR}")
+  message(STATUS "TensorFlow-LIBRARY is ${TensorFlow_LIBRARY}")
 
-      add_definitions("-DTENSORFLOW_ABI=${TensorFlow_ABI}")
-      add_definitions("-DTENSORFLOW_VERSION=${TensorFlow_VERSION}")
-  #     break()
-  #   endif()
-  # endforeach()
-
-  if(NOT TensorFlow_FOUND)
-  message(FATAL_ERROR "Your installed TensorFlow version ${TF_DETECTED_VERSION_MAJOR}.${TF_DETECTED_VERSION_MINOR} is not supported\n"
-                      "We tested against ${_TensorFlow_TEST_VERSIONS}")
-  endif()
+  add_definitions("-DTENSORFLOW_ABI=${TensorFlow_ABI}")
+  add_definitions("-DTENSORFLOW_VERSION=${TensorFlow_VERSION}")
 
   # test 1.11 version
   if("${TF_DETECTED_VERSION}" VERSION_EQUAL "1.11")
