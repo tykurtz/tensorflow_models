@@ -66,32 +66,28 @@ include_directories(
   TensorFlow_DEP
 )
 
-## Declare a C++ library
-add_library(path_estimation
-  src/deeplab.cpp
-)
-target_link_libraries(path_estimation PRIVATE TensorFlow_DEP)
+add_library(path_estimation src/deeplab.cpp)
+add_library(object_detection src/object_detection.cpp)
+add_library(image_io src/image_io.cpp)
 
-add_library(image_io
-  src/image_io.cpp
-)
-target_link_libraries(image_io PUBLIC ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
+target_link_libraries(path_estimation PUBLIC TensorFlow_DEP)
+target_link_libraries(object_detection PUBLIC ${OpenCV_LIBRARIES} TensorFlow_DEP)
+target_link_libraries(image_io PUBLIC ${OpenCV_LIBRARIES} TensorFlow_DEP)
 
 add_library(${PROJECT_NAME}
   src/deeplab_ros_wrapper.cpp
-  src/object_detection.cpp
   src/object_detection_ros_wrapper.cpp
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC ${catkin_LIBRARIES} image_io path_estimation PRIVATE TensorFlow_DEP)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${catkin_LIBRARIES} object_detection image_io path_estimation)
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(estimate_path src/nodes/path_estimation.cpp)
-target_link_libraries(estimate_path PUBLIC path_estimation image_io PRIVATE TensorFlow_DEP)
+target_link_libraries(estimate_path PUBLIC path_estimation image_io)
 
-add_executable(object_detection_node src/nodes/object_detection_node.cpp)
-target_link_libraries(object_detection_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
+add_executable(detect_objects src/nodes/detect_objects.cpp)
+target_link_libraries(detect_objects PUBLIC object_detection image_io)
 
 add_executable(ros_inference_node src/nodes/ros_inference_node.cpp)
 target_link_libraries(ros_inference_node PUBLIC ${PROJECT_NAME} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} PRIVATE TensorFlow_DEP)
