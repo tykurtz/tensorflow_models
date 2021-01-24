@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+  <remap from="/camera/image_raw" to="/camera/color/image_raw"/>
+  <!-- launch video stream -->
+  <include file="$(find video_stream_opencv)/launch/camera.launch" >
+    <arg name="camera_name" value="camera" />
+    <arg name="video_stream_provider" value="$(find tensorflow_models)/docs/woolworths.mp4" />
+    <arg name="buffer_queue_size" value="1000" />
+    <arg name="fps" value="30" />
+    <arg name="frame_id" value="videofile_frame" />
+    <arg name="camera_info_url" value="" />
+    <arg name="flip_horizontal" value="false" />
+    <arg name="flip_vertical" value="false" />
+    <arg name="loop_videofile" value="true" />
+    <arg name="start_frame" default="0"/>
+    <arg name="stop_frame" default="-1"/>
+    <arg name="visualize" value="false" />
+  </include>
+</launch>

@@ -64,6 +64,14 @@ rosrun tensorflow_models detect_objects \
     $(rospack find tensorflow_models)/models/ssd_mobilenet_v1_fpn_shared_box_predictor_640x640_coco14_sync_2018_07_03/frozen_inference_graph.pb \
     $(rospack find tensorflow_models)/test/walmart_with_people.jpg \
     $(rospack find tensorflow_models)/test/output_object_detection.jpg
+
+
+# Test video stream
+apt install ros-melodic-video-stream-opencv
+roslaunch tensorflow_models play_demo.launch
+roslaunch tensorflow_models deeplab.launch
+# Use rviz or rqt_image_view to visualize
+
 ```
 
 ## Docker
