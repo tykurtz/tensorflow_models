@@ -24,6 +24,7 @@ TODO
 
 # Roadmap
 * Add example images to documentation
+* Remove build dependency on tensorflow python wheel
 * Add Dockerfile, docker image, and run commands
 * Nodelet implementation
 * Add separate launch file for semantic segmentation
