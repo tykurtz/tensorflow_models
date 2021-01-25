@@ -3,7 +3,7 @@
   <name>tensorflow_models</name>
   <version>0.0.0</version>
   <description>Provides a ROS wrapper around some common networks found in tensorflow/models</description>
-  <maintainer email="tyler.kurtz@bossanova.com">Tyler Kurtz</maintainer>
+  <maintainer email="">Tyler Kurtz</maintainer>
   <license>TODO</license>
   <!-- <url type="website">http://wiki.ros.org/tensorflow_models/url> -->
   <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
