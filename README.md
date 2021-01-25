@@ -1,11 +1,16 @@
 # Tensorflow Models in ROS
+## Driveable terrain estimation
+
 ![](docs/driveable_demo.gif)
+
+
+## Bounding box object detection
 
 ![](docs/object_detection_demo.gif)
 
 This repository is a C++ ROS wrapper around different networks pulled from [tensorflow/models](https://github.com/tensorflow/models)
 
-There are currently four target functionalities from this repository.
+There are currently three target functionalities from this repository.
 
 1. 2D bounding box object detectors from [tensorflow/models/research/object_detection](https://github.com/tensorflow/models/tree/master/research/object_detection)
 2. Semantic segmentation using [deeplab](https://github.com/tensorflow/models/tree/master/research/deeplab)
@@ -13,21 +18,10 @@ There are currently four target functionalities from this repository.
 
 The first two networks and use cases are largely self-explanatory, but I will go into a bit more detail on the third.
 
-## Driveable terrain estimation
+### Details on driveable terrain estimation
 The use case here was to estimate per pixel what the percentage likelihood that it belonged to a road, floor, street, etc. type class. In particular, I was looking to adopt this for an indoor robot working in the retail space. This is why I selected ADE20K as a dataset as it contains many examples of indoor images with segmentation labels. The approach here was to modify DeepLabv3 trained on ADE20K by taking the linear outputs before the ArgMax layer, and applying a softmax operation.
 
 This should be considered only a starting point and you will likely to fine-tune the model for your target environment. While the main draw of ADE20K was the fact it contained training examples of indoor scenes, the labeling policy wasn't appropriate for this task in particular (see https://github.com/CSAILVision/sceneparsing/blob/master/objectInfo150.csv for list of classes). For example, labeling policies that I would find to be more robust are cityscapes including dynamic and static object classes, and wilddash including a 'void' class denoting invalid sensor input. ADE20K does not have a 'catch all' type label for generic objects nor a void label for sensor failures. Going through the dataset, one can see many examples of objects on the floor being included in the floor class.
-
-# Roadmap
-Some improvements that could be done but I can't promise I'll get ti.
-* Remove build dependency on tensorflow python wheel
-* Add Dockerfile, docker image, and run commands
-* Nodelet implementation
-* Add separate launch file for semantic segmentation
-* Add script to pull models instead of saving on github (Squash after doing this)
-* Better colormap/labeling for object detection draw
-* Colormap output for semantic segmentation
-* Semantic segmentation output
 
 # Getting started
 
@@ -107,3 +101,14 @@ https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc
 
 ## Deeplab
 https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/model_zoo.md
+
+# Roadmap
+Some improvements that could be done but I can't promise I'll get ti.
+* Remove build dependency on tensorflow python wheel
+* Add Dockerfile, docker image, and run commands
+* Nodelet implementation
+* Add separate launch file for semantic segmentation
+* Add script to pull models instead of saving on github (Squash after doing this)
+* Better colormap/labeling for object detection draw
+* Colormap output for semantic segmentation
+* Semantic segmentation output
