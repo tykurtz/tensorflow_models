@@ -1,39 +1,31 @@
 # Tensorflow Models in ROS
 ![](docs/driveable_demo.gif)
 
+![](docs/object_detection_demo.gif)
 
-This repository is a C++ ROS wrapper around several different networks pulled from [tensorflow/models](https://github.com/tensorflow/models)
+This repository is a C++ ROS wrapper around different networks pulled from [tensorflow/models](https://github.com/tensorflow/models)
 
 There are currently four target functionalities from this repository.
 
 1. 2D bounding box object detectors from [tensorflow/models/research/object_detection](https://github.com/tensorflow/models/tree/master/research/object_detection)
 2. Semantic segmentation using [deeplab](https://github.com/tensorflow/models/tree/master/research/deeplab)
-3. 2D "free space" estimation using a modified deeplab network.
-4. Planned - Free space estimation using mean-variance estimators as model ensembles (see https://arxiv.org/pdf/1612.01474.pdf)
+3. Pixel-wise "driveable terrain" estimation using a modified deeplab network.
 
-## 2D Bounding box object detectors
-Models taken from https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
+The first two networks and use cases are largely self-explanatory, but I will go into a bit more detail on the third.
 
-## Semantic segmentation using deeplab
-Models taken from https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/model_zoo.md
+## Driveable terrain estimation
+The use case here was to estimate per pixel what the percentage likelihood that it belonged to a road, floor, street, etc. type class. In particular, I was looking to adopt this for an indoor robot working in the retail space. This is why I selected ADE20K as a dataset as it contains many examples of indoor images with segmentation labels. The approach here was to modify DeepLabv3 trained on ADE20K by taking the linear outputs before the ArgMax layer, and applying a softmax operation.
 
-## Free-space estimation in 2D for indoor robots
-ADE20K is a dataset that contains many examples of indoor images with segmentation labels. The approach here was to modify DeepLabv3 trained on ADE20K by taking the linear outputs before the ArgMax layer, and applying a softmax operation. The intention is that by selecting the floor class layer from the softmax output, this gives a probability estimate of drivable terrain.
-
-NOTE: It's important to use this as a starting point and to fine-tune the model for your target environment. While ADE20K has the advantage of containing training examples of indoor scenes, the labeling policy isn't appropriate for this task in particular (see https://github.com/CSAILVision/sceneparsing/blob/master/objectInfo150.csv for list of classes). For example, labeling policies that I would find to be more robust are cityscapes including dynamic and static object classes, and wilddash including a 'void' class denoting invalid sensor input. ADE20K does not have a 'catch all' type label for generic objects nor a void label for sensor failures. Going through the dataset, one can see many examples of objects on the floor being included in the floor class.
-
-## Free-space estimation using mean-variance estimators as model ensembles
-TODO
+This should be considered only a starting point and you will likely to fine-tune the model for your target environment. While the main draw of ADE20K was the fact it contained training examples of indoor scenes, the labeling policy wasn't appropriate for this task in particular (see https://github.com/CSAILVision/sceneparsing/blob/master/objectInfo150.csv for list of classes). For example, labeling policies that I would find to be more robust are cityscapes including dynamic and static object classes, and wilddash including a 'void' class denoting invalid sensor input. ADE20K does not have a 'catch all' type label for generic objects nor a void label for sensor failures. Going through the dataset, one can see many examples of objects on the floor being included in the floor class.
 
 # Roadmap
-* Add example images to documentation
+Some improvements that could be done but I can't promise I'll get ti.
 * Remove build dependency on tensorflow python wheel
 * Add Dockerfile, docker image, and run commands
 * Nodelet implementation
 * Add separate launch file for semantic segmentation
 * Add script to pull models instead of saving on github (Squash after doing this)
-* Add MVE model ensemble
-* Better colormap for object detection draw
+* Better colormap/labeling for object detection draw
 * Colormap output for semantic segmentation
 * Semantic segmentation output
 
@@ -68,34 +60,35 @@ rosrun tensorflow_models detect_objects \
     $(rospack find tensorflow_models)/test/walmart_with_people.jpg \
     $(rospack find tensorflow_models)/test/output_object_detection.jpg
 
-
-# Test video stream
+# Needed for play_demo.launch
 apt install ros-melodic-video-stream-opencv
+
 roslaunch tensorflow_models play_demo.launch
 roslaunch tensorflow_models deeplab.launch
+# or..
+
+roslaunch tensorflow_models play_demo.launch
+roslaunch tensorflow_models object_detection.launch
 # Use rviz or rqt_image_view to visualize
 
 ```
 
 ## Docker
-Using docker with GPU support will be the recommended approach, but is currently WIP.
+WIP.
 
 # Motivation
-The primary goal is efficiency with the target language being C++. This gives access to image_transport and nodelets, which cuts down on unnecessary serializing/deserializing of images. Another goal was to target tensorflow/models,
+One of my goals was efficiency with the target language being C++. From a ROS perspective, this gives access to `image_transport` and nodelets, which cuts down on unnecessary serializing/deserializing of images. Due to not using python, this requires building tensorflow from source, see https://github.com/tradr-project/tensorflow_ros_cpp#c-abi-difference-problems
 
-https://github.com/tensorflow/models/tree/master/research/object_detection for bounding box detection.
-https://github.com/tensorflow/models/tree/master/research/deeplab for segmentation, and for 2D 'free space' perception.
-
-This comes with the caveat that you need to build tensorflow from source, see https://github.com/tradr-project/tensorflow_ros_cpp#c-abi-difference-problems
-
-Care was taken to minimize dependencies into deeplab and object_detection so ROS agnostic projects might benefit from these classes.
+Care was taken to minimize dependencies between the deeplab and object_detection classes and their ROS wrappers. So it should be possible to easily use these classes outside of ROS if you prefer.
 
 ## Related work
 https://github.com/leggedrobotics/darknet_ros
-- C++ and actively maintained. Very good starting point for bounding box detection. Only supports YOLO v3, no nodelet support
+- C++ and actively maintained. Very good starting point for bounding box detection.
+- Only supports YOLO v3, but no nodelet support
 
 https://github.com/UbiquityRobotics/dnn_detect
-- C++, uses opencv DNN interface. Another good starting point, example uses SSD with a mobilenet backbone. Utilizes image_transport, no nodelet support
+- C++, uses opencv DNN interface. Another good starting point, example uses SSD with a mobilenet backbone.
+- Utilizes image_transport, but no nodelet support
 
 https://github.com/osrf/tensorflow_object_detector
 - Python only. Followed a similar approach by targetting a (now outdated) fork of tensorflow/models.
@@ -107,3 +100,10 @@ https://github.com/tradr-project/tensorflow_ros_test
 
 https://github.com/PatWie/tensorflow-cmake
 - Source of the FindTensorflow.cmake file in this project
+
+# Model sources
+## 2D Bounding box object detectors
+https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
+
+## Deeplab
+https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/model_zoo.md
